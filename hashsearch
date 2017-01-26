@@ -3,7 +3,7 @@
 #	AUTHOR : Yusuph Wickama (Wick3rman)
 #	DATE : 28/12/2016
 #	DESCRPTION : This shell script looks for hashes some online databases, for faster retrieval of decrypted password hashes
-#	DISCLAIMER: This tool is only intended to be a proof of concept demonstration tool for authorized security testing
+#	DISCLAIMER: This script is intended for authorized security testing only.
 #   
 
 link="http://hashtoolkit.com/reverse-hash?hash="
@@ -25,7 +25,7 @@ if [ ! "$stdLength" -ge 32 ]; then
     echo "|   ||   |\__ \|   | \__ \| _> |   ||   /| <__|   |";
     echo "|_|_||_|_|<___/|_|_| <___/|___>|_|_||_\_\\\\___/|_|_|";
     echo "                                                   ";
-    echo "$(tput setaf 2)[+] Created by : Wick3rman"
+    echo "$(tput setaf 2)[+] Created by : Yusuph Wickama (Wick3rman)"
     echo "$(tput setaf 2)[+] Script : HashSearch v1.25"
     echo -e "$(tput setaf 3)[+] Legal Disclaimer : The developer assumes no liability and is not responsible for any misuse or damage caused by this script. \nIt is intended for authorized security testing only."
     
@@ -186,8 +186,9 @@ if [[ $* == *"--help"* || $* == *"--help"* && $* == *"--input"* ]]; then
     echo ""
     echo "Example"
     echo "-----------------------------------------------------------------------"
-    echo "hashsearch a46a773ac96183976829b88349a5d822"
-    echo "echo fb197b16c17099e7bca7083790aeb5f7 | hashsearch --input"
+    echo "[-] Normal usage: hashsearch a46a773ac96183976829b88349a5d822"
+	echo ""
+    echo "[-] Through piping: echo fb197b16c17099e7bca7083790aeb5f7 | hashsearch --input"
     echo ""
     exit
 elif [ $stdLength -ge 32 ]; then
