@@ -27,7 +27,7 @@ if [ ! "$stdLength" -ge 32 ]; then
     echo "                                                   ";
     echo "$(tput setaf 2)[+] Created by : Yusuph Wickama (Wick3rman)"
     echo "$(tput setaf 2)[+] Script : HashSearch v1.25"
-    echo -e "$(tput setaf 3)[+] Legal Disclaimer : The developer assumes no liability and is not responsible for any misuse or damage caused by this script."
+    echo "$(tput setaf 3)[+] Legal Disclaimer : The developer assumes no liability and is not responsible for any misuse or damage caused by this script."
     echo ""
 fi
 
