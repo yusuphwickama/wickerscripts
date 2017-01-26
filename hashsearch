@@ -186,8 +186,9 @@ if [[ $* == *"--help"* || $* == *"--help"* && $* == *"--input"* ]]; then
     echo ""
     echo "Example"
     echo "-----------------------------------------------------------------------"
-    echo "hashsearch a46a773ac96183976829b88349a5d822"
-    echo "echo fb197b16c17099e7bca7083790aeb5f7 | hashsearch --input"
+    echo "[-] Normal usage: hashsearch a46a773ac96183976829b88349a5d822"
+	echo ""
+    echo "[-] Through piping: echo fb197b16c17099e7bca7083790aeb5f7 | hashsearch --input"
     echo ""
     exit
 elif [ $stdLength -ge 32 ]; then
