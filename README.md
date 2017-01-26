@@ -10,6 +10,7 @@
 ![Screenshot of Hashsearch](https://s25.postimg.org/jvdctflxr/hashsearch.png)
 
 > **Installation:**
+
 > Being in the same directory (working directory) as the script, run the command:
 
 > :~# **sudo hashsearch /usr/local/bin**
