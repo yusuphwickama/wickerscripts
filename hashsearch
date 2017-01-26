@@ -1,0 +1,228 @@
+#!/bin/bash
+#
+#	AUTHOR : Yusuph Wickama (Wick3rman)
+#	DATE : 28/12/2016
+#	DESCRPTION : This shell script looks for hashes some online databases, for faster retrieval of decrypted password hashes
+#	DISCLAIMER: This tool is only intended to be a proof of concept demonstration tool for authorized security testing
+#   
+
+link="http://hashtoolkit.com/reverse-hash?hash="
+link2="http://md5.mugend.net"
+filter=""
+hash2=$1
+length=${#hash2}
+
+if [[ $* == "--input" ]]; then
+    read stdInput
+fi
+
+stdLength=${#stdInput}
+
+if [ ! "$stdLength" -ge 32 ]; then
+    tput setaf 3
+    echo " _ _  ___  ___  _ _   ___  ___  ___  ___  ___  _ _ ";
+    echo "| | || . |/ __>| | | / __>| __>| . || . \|  _>| | |";
+    echo "|   ||   |\__ \|   | \__ \| _> |   ||   /| <__|   |";
+    echo "|_|_||_|_|<___/|_|_| <___/|___>|_|_||_\_\\\\___/|_|_|";
+    echo "                                                   ";
+    echo "$(tput setaf 2)[+] Created by : Wick3rman"
+    echo "$(tput setaf 2)[+] Script : HashSearch v1.25"
+    echo -e "$(tput setaf 3)[+] Legal Disclaimer : The developer assumes no liability and is not responsible for any misuse or damage caused by this script. \nIt is intended for authorized security testing only."
+    
+    echo ""
+fi
+
+####### START OF SHELL FUNCTIONS ########
+
+function check_one {
+    if [ "$length" -eq 32 ]; then
+        filter="decrypted md5 hash"
+    elif [ "$length" -eq 40 ]; then
+        filter="decrypted sha1 hash"
+    elif [ "$length" -eq 64 ]; then
+        filter="decrypted sha256 hash"
+    elif [ "$length" -eq 96 ]; then
+        filter="decrypted sha384 hash"
+    elif [ "$length" -eq 128 ]; then
+        filter="decrypted sha512 hash"
+    else
+        echo "$(tput setaf 1)[!]$(tput setaf 7)Invalid option, try hashsearch --help for more info"
+        exit
+	fi
+	
+	link="$link$hash2"
+	
+	echo "$(tput setaf 4)[+] Checking for Hash $(tput setaf 3)(Please wait)"
+	echo -n "$(tput setaf 4)[+] Source (1): "
+	
+	output="$(curl -s $link)"
+	
+	echo "$output" > /tmp/tempfile.hsearch
+	
+	
+	if [ $(grep -i -c "No hashes found for" /tmp/tempfile.hsearch) -ge 1 ]; then
+        echo "$(tput setaf 1)Hash not found"
+        check_two
+    else
+        hash="$(grep "$filter" /tmp/tempfile.hsearch | sed 's/<\/\?[^>]\+>//g' | tr -d ' ')"
+        echo "$(tput setaf 3)Hash found"
+        echo "$(tput setaf 6)[+] Decrypted hash: $(tput setaf 2)$hash"
+        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        rm /tmp/tempfile.hsearch
+        exit
+	fi
+}
+
+function check_one_std {
+    if [ "$stdLength" -eq 32 ]; then
+        filter="decrypted md5 hash"
+    elif [ "$stdLength" -eq 40 ]; then
+        filter="decrypted sha1 hash"
+    elif [ "$stdLength" -eq 64 ]; then
+        filter="decrypted sha256 hash"
+    elif [ "$stdLength" -eq 96 ]; then
+        filter="decrypted sha384 hash"
+    elif [ "$stdLength" -eq 128 ]; then
+        filter="decrypted sha512 hash"
+    else
+        echo "$(tput setaf 1)[!]$(tput setaf 7)Invalid option, try hashsearch --help for more info" > /dev/stderr 
+        exit
+	fi
+	
+	link="$link$hash2"
+	
+	output="$(curl -s $link)"
+	
+	echo "$output" > /tmp/tempfile.hsearch
+	
+	
+	if [ $(grep -i -c "No hashes found for" /tmp/tempfile.hsearch) -ge 1 ]; then
+        check_two_std
+    else
+        hash="$(grep "$filter" /tmp/tempfile.hsearch | sed 's/<\/\?[^>]\+>//g' | tr -d ' ')"
+        echo "$hash"
+        rm /tmp/tempfile.hsearch
+        exit
+	fi
+}
+
+function check_two {
+    echo -n "$(tput setaf 4)[+] Source (2): "
+    
+    declare -A valueOf
+    for i in 0 1 2 3 4 5 6 7 8 9; do
+        valueOf["$i"]="1$i"
+    done
+    valueOf["a"]=20; valueOf["b"]=21; valueOf["c"]=22; valueOf["d"]=23; valueOf["e"]=24; valueOf["f"]=25;
+    
+    h1="${hash2:0:1}"
+    h2="${hash2:1:1}"
+    h3="${hash2:2:1}"
+    h4="${hash2:3:1}"
+    
+    link2="$link2/${valueOf["$h1"]}.php?id=${valueOf["$h2"]}${valueOf["$h3"]}${valueOf["$h4"]}"
+    
+    output2="$(curl -s $link2)"
+
+    echo "$output2" > /tmp/tempfile.hsearch
+    
+    if [ $(grep -i -c "$hash2" /tmp/tempfile.hsearch) -ge 1 ]; then
+        foundHash="$(grep "$hash2" /tmp/tempfile.hsearch | sed 's/<\/\?[^>]\+>//g' | tr -d ' ')"
+        final=${foundHash:length}
+        
+        echo "$(tput setaf 3)Hash found"
+        echo "$(tput setaf 6)[+] Decrypted hash: $(tput setaf 2)$final"
+        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        rm /tmp/tempfile.hsearch
+        exit
+    else
+        echo "$(tput setaf 1)Hash not found"
+        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        rm /tmp/tempfile.hsearch
+        exit
+    fi
+}
+
+function check_two_std {
+    
+    declare -A valueOf
+    for i in 0 1 2 3 4 5 6 7 8 9; do
+        valueOf["$i"]="1$i"
+    done
+    valueOf["a"]=20; valueOf["b"]=21; valueOf["c"]=22; valueOf["d"]=23; valueOf["e"]=24; valueOf["f"]=25;
+    
+    h1="${hash2:0:1}"
+    h2="${hash2:1:1}"
+    h3="${hash2:2:1}"
+    h4="${hash2:3:1}"
+    
+    link2="$link2/${valueOf["$h1"]}.php?id=${valueOf["$h2"]}${valueOf["$h3"]}${valueOf["$h4"]}"
+    
+    output2="$(curl -s $link2)"
+
+    echo "$output2" > /tmp/tempfile.hsearch
+    
+    if [ $(grep -i -c "$hash2" /tmp/tempfile.hsearch) -ge 1 ]; then
+        foundHash="$(grep "$hash2" /tmp/tempfile.hsearch | sed 's/<\/\?[^>]\+>//g' | tr -d ' ')"
+        final=${foundHash:stdLength}
+        
+        echo "$final"
+        rm /tmp/tempfile.hsearch
+        exit
+    else
+        echo "[!] Not found"
+        rm /tmp/tempfile.hsearch
+        exit
+    fi
+}
+
+####### END OF SHELL FUNCTIONS ########
+
+if [[ $* == *"--help"* || $* == *"--help"* && $* == *"--input"* ]]; then
+    tput setaf 7
+    echo "USAGE: hashsearch [option] [hash]"
+    echo ""
+    echo "--input               To pass hash using standard input"
+    echo ""
+    echo "Example"
+    echo "-----------------------------------------------------------------------"
+    echo "hashsearch a46a773ac96183976829b88349a5d822"
+    echo "echo fb197b16c17099e7bca7083790aeb5f7 | hashsearch --input"
+    echo ""
+    exit
+elif [ $stdLength -ge 32 ]; then
+    #### PROCESS FROM STANDARD INPUT ####
+    
+    hash2=$stdInput
+
+	wget -q --tries=3 --timeout=3 --spider http://google.com
+    if [[ $? -ne 0 ]]; then
+        echo "$(tput setaf 1)Not Connected"
+        exit
+    fi
+
+    tput setaf 7
+    check_one_std $hash2
+fi
+
+if [ $# -ne 1 ]; then
+	echo "$(tput setaf 7)[+] USAGE: hashsearch [hash], try hashsearch --help for more info"
+	exit
+else
+    echo "$(tput setaf 4)[+] Starting at :$(tput setaf 7) $( date +%T)"
+    echo -n "$(tput setaf 4)[+] Checking for Connection : "
+
+	wget -q --tries=3 --timeout=3 --spider http://google.com
+    if [[ $? -eq 0 ]]; then
+        echo "$(tput setaf 2)Connected"
+    else
+        echo "$(tput setaf 1)Not Connected, Check your internet."
+        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        exit
+    fi
+
+    tput setaf 7
+    check_one $hash2
+	
+fi
+
