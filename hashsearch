@@ -25,7 +25,7 @@ if [ ! "$stdLength" -ge 32 ]; then
     echo "|   ||   |\__ \|   | \__ \| _> |   ||   /| <__|   |";
     echo "|_|_||_|_|<___/|_|_| <___/|___>|_|_||_\_\\\\___/|_|_|";
     echo "                                                   ";
-    echo "$(tput setaf 2)[+] Created by : Wick3rman"
+    echo "$(tput setaf 2)[+] Created by : Yusuph Wickama (Wick3rman)"
     echo "$(tput setaf 2)[+] Script : HashSearch v1.25"
     echo -e "$(tput setaf 3)[+] Legal Disclaimer : The developer assumes no liability and is not responsible for any misuse or damage caused by this script. \nIt is intended for authorized security testing only."
     
