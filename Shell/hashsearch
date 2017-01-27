@@ -66,7 +66,7 @@ function check_one {
         hash="$(grep "$filter" /tmp/tempfile.hsearch | sed 's/<\/\?[^>]\+>//g' | tr -d ' ')"
         echo "$(tput setaf 3)Hash found"
         echo "$(tput setaf 6)[+] Decrypted hash: $(tput setaf 2)$hash"
-        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        echo "$(tput setaf 4)[+] Finished at :$(tput setaf 7) $( date +%T)"
         rm /tmp/tempfile.hsearch
         exit
 	fi
@@ -131,12 +131,12 @@ function check_two {
         
         echo "$(tput setaf 3)Hash found"
         echo "$(tput setaf 6)[+] Decrypted hash: $(tput setaf 2)$final"
-        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        echo "$(tput setaf 4)[+] Finished at :$(tput setaf 7) $( date +%T)"
         rm /tmp/tempfile.hsearch
         exit
     else
         echo "$(tput setaf 1)Hash not found"
-        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        echo "$(tput setaf 4)[+] Finished at :$(tput setaf 7) $( date +%T)"
         rm /tmp/tempfile.hsearch
         exit
     fi
@@ -217,7 +217,7 @@ else
         echo "$(tput setaf 2)Connected"
     else
         echo "$(tput setaf 1)Not Connected, Check your internet."
-        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        echo "$(tput setaf 4)[+] Finished at :$(tput setaf 7) $( date +%T)"
         exit
     fi
 
