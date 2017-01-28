@@ -4,8 +4,7 @@
 #	DATE : 28/12/2016
 #	DESCRPTION : This shell script looks for hashes some online databases, for faster retrieval of decrypted password hashes
 #	DISCLAIMER: This script is intended for authorized security testing only.
-#   
-
+#  
 link="http://hashtoolkit.com/reverse-hash?hash="
 link2="http://md5.mugend.net"
 filter=""
