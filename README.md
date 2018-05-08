@@ -7,7 +7,7 @@
 
 **Hashsearch** - For searching decrypted MD5 hashes from some online databases. Click [here](https://github.com/wickerlabs/WickerScripts/blob/master/Shell/hashsearch).
  
-![Screenshot of Hashsearch](https://s25.postimg.org/jvdctflxr/hashsearch.png)
+![Screenshot of Hashsearch](https://sandbox.wickerlabs.com/gallery/hashsearch.png)
 
 > **Installation:**
 
