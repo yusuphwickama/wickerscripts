@@ -1,0 +1,172 @@
+#!/bin/bash
+
+tput setaf 3
+
+echo "+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+"
+echo "|P|a|c|k|a|g|e| |D|o|w|n|l|o|a|d|e|r| |v|1|.|2|"
+echo "+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+"
+echo "------------- Created by Wick3rman ------------"
+echo ""
+
+tput setaf 7
+
+if [[ $# -lt 1 ]]; then
+    echo "[!] No package name provided"
+    exit
+fi
+
+package="$1"
+filename="deb.list"
+fname="complete_deb.txt"
+gcount=$(apt-cache depends ${package} | grep -v "<" | grep -i -c -w "Depends:")
+it=0
+
+if [[ ${gcount} -eq 0 ]]; then
+    echo "[+] Verify the package name using '$(tput setaf 6)apt search$(tput setaf 7)' and try again"
+    exit
+fi
+
+wget -q --tries=3 --timeout=3 --spider http://google.com
+
+if [[ $? -ne 0 ]]; then
+    echo "$(tput setaf 1)No connection, check your internet and try again"
+    exit
+fi
+
+### Function to download package
+function download_packages {
+
+    while read -r line
+    do
+        name="$line"
+        echo "$(tput setaf 7)[-] Downloading:$(tput setaf 6) $name $(tput setaf 7)"
+        apt-get download "$name" &> /dev/null
+    done < "$1"
+    
+    echo "$(tput setaf 7)[-] Downloading:$(tput setaf 6) $package $(tput setaf 7)"
+    
+    apt-get download "$package" &> /dev/null
+}
+
+### Function to get dependencies and append them to package list file (deb.list)
+function get_dependencies {
+    p1="$1"
+    
+    #echo "$(tput setaf 7)[-] Getting dependencies for:$(tput setaf 6) $p1 $(tput setaf 7)"
+    
+    apt-cache depends ${p1} | grep -v "<" | grep -w "Depends:" > "$1_$filename"
+    
+    sed -i -e 's/[<>|:]//g' "$1_$filename"
+    sed -i -e 's/Depends//g' "$1_$filename"
+    sed -i -e 's/ //g' "$1_$filename"
+    
+    lcount=$(apt-cache depends ${p1} | grep -v "<" | grep -i -c -w "Depends:")
+    
+    #echo "$(tput setaf 7)[-] Dependencies found: $lcount"
+    
+    lit=0
+        
+    while [ ${lit} -lt ${lcount} ]
+
+    do
+        read -r line
+        
+        name="$line"
+        
+        get_dependencies ${name}
+        
+        lit=$(expr ${lit} + 1)
+        
+    done < "$1_$filename"
+
+}
+
+### Function 
+function get_global {
+
+    echo "$(tput setaf 7)[-] Found $gcount dependencies for:$(tput setaf 6) $1 $(tput setaf 7)"
+    
+    apt-cache depends $1 | grep -v "<" | grep -w "Depends:" > "$1_$filename"
+    
+    sed -i -e 's/[<>|:]//g' "$1_$filename"
+
+    sed -i -e 's/Depends//g' "$1_$filename"
+
+    sed -i -e 's/ //g' "$1_$filename"
+
+    while [ ${it} -lt ${gcount} ]
+    do
+        while read -r line
+        do
+            name="$line"
+            
+            round=$(expr ${it} + 1)
+            
+            if [[ $( echo ${name} | grep -v "<" | grep -c -w "Depends:") -lt 1 ]]; then
+                
+                #echo "[$] Round $round:$(tput setaf 6) $name $(tput setaf 7)"
+
+                get_dependencies ${name}
+            fi
+            
+            it=$(expr ${it} + 1)
+            
+        done < "$1_$filename"
+    
+    done
+
+}
+
+mkdir "$package" &> /dev/null
+
+if [[ $? -eq 0 ]]; then
+    echo "$(tput setaf 2)[+] Created directory $(tput setaf 6)$package"
+
+    cd "$package"
+    
+    get_global "$package"
+    
+    echo "" >> ${fname}
+    
+    sort *.list | uniq > ${fname}
+    
+    rm *.list
+    
+    ## Read again the final list to get child dependencies
+    echo "[-] Getting child dependencies"
+    while read -r line
+    do
+        name="$line"
+        
+        if [[ $( echo ${name} | grep -v "<" | grep -c -w "Depends:") -lt 1 ]]; then
+            
+            #echo "[$] Round $round:$(tput setaf 6) $name $(tput setaf 7)"
+
+            get_dependencies ${name}
+        fi
+        
+        it=$(expr ${it} + 1)
+        
+    done < "$fname"
+    
+    sort *.list | uniq > ${fname}
+    
+    rm *.list
+    
+    download_packages ${fname}
+
+    echo "$(tput setaf 7)[-] Zipping all downloaded packages to $(tput setaf 6)$package.zip"
+
+    cd ..
+
+    zip -r "./$package.zip" "$package/" &> /dev/null
+
+    echo "$(tput setaf 7)[-] Removing original directory"
+
+    rm -r "./$package/"
+
+    echo "$(tput setaf 2)[-] Operations complete"
+    echo "$(tput setaf 7)[+] Use command '$(tput setaf 6)sudo dpkg -i *.deb$(tput setaf 7)' to install the downloaded packages"
+else
+    echo "$(tput setaf 7)[!] Failed to create directory $(tput setaf 6)$package$(tput setaf 7) delete existing directory or make sure you have sufficient permissions."
+fi
