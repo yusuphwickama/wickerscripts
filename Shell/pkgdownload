@@ -3,7 +3,7 @@
 tput setaf 3
 
 echo "+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+"
-echo "|P|a|c|k|a|g|e| |D|o|w|n|l|o|a|d|e|r| |v|1|.|2|"
+echo "|P|a|c|k|a|g|e| |D|o|w|n|l|o|a|d|e|r| |v|1|.|3|"
 echo "+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+"
 echo "------------- Created by Wick3rman ------------"
 echo ""
@@ -20,6 +20,7 @@ filename="deb.list"
 fname="complete_deb.txt"
 gcount=$(apt-cache depends ${package} | grep -v "<" | grep -i -c -w "Depends:")
 it=0
+masterlist="dependencies_master_$RANDOM.mlist"
 
 if [[ ${gcount} -eq 0 ]]; then
     echo "[+] Verify the package name using '$(tput setaf 6)apt search$(tput setaf 7)' and try again"
@@ -33,27 +34,57 @@ if [[ $? -ne 0 ]]; then
     exit
 fi
 
+function is_not_present {
+    echo $(cat ${masterlist} | grep -i -c "$1")
+}
+
+function add_to_master_list {
+    presr=$(is_not_present "$1")
+
+    if [[ ${presr} -eq 0 ]]; then
+        echo "$1" >> ${masterlist}
+        echo "[-] Added $(tput setaf 6) $1 $(tput setaf 7) to dependency list"
+    fi
+
+}
 ### Function to download package
 function download_packages {
-
     while read -r line
     do
         name="$line"
         echo "$(tput setaf 7)[-] Downloading:$(tput setaf 6) $name $(tput setaf 7)"
         apt-get download "$name" &> /dev/null
+
+        if [[ $? -eq 0 ]]; then
+            tput cuu1
+            echo "$(tput setaf 7)[-] Downloading:$(tput setaf 6) $name $(tput setaf 2)[$(echo $'\u2714')]$(tput setaf 7)"
+        else
+            tput cuu1
+            echo "$(tput setaf 7)[-] Downloading:$(tput setaf 6) $name $(tput setaf 1)[x]$(tput setaf 7)"
+        fi
+
     done < "$1"
     
     echo "$(tput setaf 7)[-] Downloading:$(tput setaf 6) $package $(tput setaf 7)"
-    
+
     apt-get download "$package" &> /dev/null
+
+    if [[ $? -eq 0 ]]; then
+        tput cuu1
+        echo "$(tput setaf 7)[-] Downloading:$(tput setaf 6) $package $(tput setaf 2)[$(echo $'\u2714')]$(tput setaf 7)"
+    else
+        tput cuu1
+        echo "$(tput setaf 7)[-] Downloading:$(tput setaf 6) $package $(tput setaf 1)[$(echo $'\u274c')]$(tput setaf 7)"
+    fi
+
+    add_to_master_list ${package}
+
 }
 
 ### Function to get dependencies and append them to package list file (deb.list)
 function get_dependencies {
     p1="$1"
-    
-    #echo "$(tput setaf 7)[-] Getting dependencies for:$(tput setaf 6) $p1 $(tput setaf 7)"
-    
+
     apt-cache depends ${p1} | grep -v "<" | grep -w "Depends:" > "$1_$filename"
     
     sed -i -e 's/[<>|:]//g' "$1_$filename"
@@ -61,8 +92,6 @@ function get_dependencies {
     sed -i -e 's/ //g' "$1_$filename"
     
     lcount=$(apt-cache depends ${p1} | grep -v "<" | grep -i -c -w "Depends:")
-    
-    #echo "$(tput setaf 7)[-] Dependencies found: $lcount"
     
     lit=0
         
@@ -73,17 +102,18 @@ function get_dependencies {
         
         name="$line"
         
-        get_dependencies ${name}
+        if [[ $(is_not_present "$name") -eq 0 ]]; then
+            add_to_master_list ${name}
+            get_dependencies ${name}
+        fi
         
         lit=$(expr ${lit} + 1)
         
     done < "$1_$filename"
-
 }
 
 ### Function 
 function get_global {
-
     echo "$(tput setaf 7)[-] Found $gcount dependencies for:$(tput setaf 6) $1 $(tput setaf 7)"
     
     apt-cache depends $1 | grep -v "<" | grep -w "Depends:" > "$1_$filename"
@@ -103,18 +133,17 @@ function get_global {
             round=$(expr ${it} + 1)
             
             if [[ $( echo ${name} | grep -v "<" | grep -c -w "Depends:") -lt 1 ]]; then
-                
-                #echo "[$] Round $round:$(tput setaf 6) $name $(tput setaf 7)"
 
-                get_dependencies ${name}
+                if [[ $(is_not_present "$name") -eq 0 ]]; then
+                    #echo "[-] Adding ${name} to masterlist"
+                    add_to_master_list ${name}
+                    get_dependencies ${name}
+                fi
             fi
             
             it=$(expr ${it} + 1)
-            
         done < "$1_$filename"
-    
     done
-
 }
 
 mkdir "$package" &> /dev/null
@@ -123,6 +152,9 @@ if [[ $? -eq 0 ]]; then
     echo "$(tput setaf 2)[+] Created directory $(tput setaf 6)$package"
 
     cd "$package"
+
+    #create masterlist file
+    touch ${masterlist}
     
     get_global "$package"
     
@@ -133,7 +165,7 @@ if [[ $? -eq 0 ]]; then
     rm *.list
     
     ## Read again the final list to get child dependencies
-    echo "[-] Getting child dependencies"
+    echo "[++] Getting child dependencies"
     while read -r line
     do
         name="$line"
@@ -142,7 +174,14 @@ if [[ $? -eq 0 ]]; then
             
             #echo "[$] Round $round:$(tput setaf 6) $name $(tput setaf 7)"
 
-            get_dependencies ${name}
+            pre=$(cat ${masterlist} | grep -i -c "$name")
+
+            #echo "Pret: $pre"
+
+            if [ ${pre} -eq 0 ]; then
+                get_dependencies ${name}
+                add_to_master_list ${name}
+            fi
         fi
         
         it=$(expr ${it} + 1)
@@ -150,10 +189,14 @@ if [[ $? -eq 0 ]]; then
     done < "$fname"
     
     sort *.list | uniq > ${fname}
-    
+
+    # delete all list files
     rm *.list
-    
-    download_packages ${fname}
+
+    download_packages ${masterlist}
+
+    # delete list file
+    rm ${fname}
 
     echo "$(tput setaf 7)[-] Zipping all downloaded packages to $(tput setaf 6)$package.zip"
 
