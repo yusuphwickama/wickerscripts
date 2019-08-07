@@ -27,7 +27,7 @@ if [[ ${gcount} -eq 0 ]]; then
     exit
 fi
 
-wget -q --tries=3 --timeout=3 --spider http://google.com
+wget -q --tries=3 --timeout=3 --spider https://www.apple.com
 
 if [[ $? -ne 0 ]]; then
     echo "$(tput setaf 1)No connection, check your internet and try again"
