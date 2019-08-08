@@ -198,11 +198,11 @@ if [[ $? -eq 0 ]]; then
     # delete list file
     rm ${fname}
 
-    echo "$(tput setaf 7)[-] Zipping all downloaded packages to $(tput setaf 6)$package.zip"
+    echo "$(tput setaf 7)[-] Compressing all downloaded packages to $(tput setaf 6)$package.tar.gz"
 
     cd ..
 
-    zip -r "./$package.zip" "$package/" &> /dev/null
+    tar -zcvf "./$package.tar.gz" "$package/" &> /dev/null
 
     echo "$(tput setaf 7)[-] Removing original directory"
 
