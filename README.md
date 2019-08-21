@@ -5,7 +5,7 @@
 **Scripts:**
 
 ---
-**pkgdownload** - For downloading apt packages with corresponding dependencies. After downloading, all files are bundled together in a zip file. You can find it [here](https://github.com/wickerlabs/WickerScripts/blob/master/Shell/pkgdownload).
+**pkgdownload** - For downloading apt packages with corresponding dependencies. After downloading, all files are bundled together in a tarball. You can find it [here](https://github.com/wickerlabs/WickerScripts/blob/master/Shell/pkgdownload).
 
 ![Screenshot of pkgdownload](https://i.postimg.cc/sgM1FRDf/pkgdpwnload.png)
 
