@@ -4,8 +4,7 @@
 #	DATE : 28/12/2016
 #	DESCRPTION : This shell script looks for hashes some online databases, for faster retrieval of decrypted password hashes
 #	DISCLAIMER: This script is intended for authorized security testing only.
-#   
-
+#  
 link="http://hashtoolkit.com/reverse-hash?hash="
 link2="http://md5.mugend.net"
 filter=""
@@ -27,8 +26,7 @@ if [ ! "$stdLength" -ge 32 ]; then
     echo "                                                   ";
     echo "$(tput setaf 2)[+] Created by : Yusuph Wickama (Wick3rman)"
     echo "$(tput setaf 2)[+] Script : HashSearch v1.25"
-    echo -e "$(tput setaf 3)[+] Legal Disclaimer : The developer assumes no liability and is not responsible for any misuse or damage caused by this script. \nIt is intended for authorized security testing only."
-    
+    echo "$(tput setaf 3)[+] Legal Disclaimer : The developer assumes no liability and is not responsible for any misuse or damage caused by this script."
     echo ""
 fi
 
@@ -67,7 +65,7 @@ function check_one {
         hash="$(grep "$filter" /tmp/tempfile.hsearch | sed 's/<\/\?[^>]\+>//g' | tr -d ' ')"
         echo "$(tput setaf 3)Hash found"
         echo "$(tput setaf 6)[+] Decrypted hash: $(tput setaf 2)$hash"
-        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        echo "$(tput setaf 4)[+] Finished at :$(tput setaf 7) $( date +%T)"
         rm /tmp/tempfile.hsearch
         exit
 	fi
@@ -132,12 +130,12 @@ function check_two {
         
         echo "$(tput setaf 3)Hash found"
         echo "$(tput setaf 6)[+] Decrypted hash: $(tput setaf 2)$final"
-        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        echo "$(tput setaf 4)[+] Finished at :$(tput setaf 7) $( date +%T)"
         rm /tmp/tempfile.hsearch
         exit
     else
         echo "$(tput setaf 1)Hash not found"
-        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        echo "$(tput setaf 4)[+] Finished at :$(tput setaf 7) $( date +%T)"
         rm /tmp/tempfile.hsearch
         exit
     fi
@@ -218,7 +216,7 @@ else
         echo "$(tput setaf 2)Connected"
     else
         echo "$(tput setaf 1)Not Connected, Check your internet."
-        echo "$(tput setaf 4)[+] Quiting at :$(tput setaf 7) $( date +%T)"
+        echo "$(tput setaf 4)[+] Finished at :$(tput setaf 7) $( date +%T)"
         exit
     fi
 
