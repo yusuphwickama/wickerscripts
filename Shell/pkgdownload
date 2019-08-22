@@ -129,7 +129,7 @@ function get_dependencies {
     # $1 package name
     p1="$1"
     apt-cache depends ${p1} | grep -v "<" | grep -w "Depends:" > "${p1}_${filename}"
-    
+
     sed -i -e 's/[<>|:]//g' "${p1}_${filename}"
     sed -i -e 's/Depends//g' "${p1}_${filename}"
     sed -i -e 's/ //g' "${p1}_${filename}"
@@ -137,7 +137,7 @@ function get_dependencies {
     # Local count
     lcount=$(apt-cache depends ${p1} | grep -v "<" | grep -icw "Depends:")
     lit=0
-        
+
     while [ ${lit} -lt ${lcount} ]
     do
         read -r line
@@ -170,7 +170,7 @@ function get_global {
         do
             name="$line"
             round=$(expr ${it} + 1)
-            
+
             if [[ $( echo ${name} | grep -v "<" | grep -c -w "Depends:") -lt 1 ]]; then
                 if [[ $(is_not_present "$name") -eq 0 ]]; then
                     #echo "[-] Adding ${name} to masterlist"
@@ -205,7 +205,7 @@ if [[ $? -eq 0 ]]; then
     # Sort and remove duplicates
     echo "" >> ${fname}
     sort *.list | uniq > ${fname}
-    
+
     # read the masterlist to get child dependencies
     echo "[++] Checking for child dependencies"
     while read -r line
