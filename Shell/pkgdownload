@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export LANG=C 
 # check for provided arguments
 if [[ $# -lt 1 ]]; then
     echo "[!] No package name provided"
