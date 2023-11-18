@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 export LANG=C 
 # check for provided arguments
 if [[ $# -lt 1 ]]; then
